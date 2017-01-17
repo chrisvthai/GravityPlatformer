@@ -7,3 +7,5 @@ WASD control the player's movement
 IJKL control the direction of gravity
 
 Space = Jump
+
+E = Use an item (i.e. Flip a switch)
