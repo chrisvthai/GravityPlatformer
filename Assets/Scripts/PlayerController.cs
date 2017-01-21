@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
     public float maxSpeed = 5f;
     public float jumpForce = 500f;
     public Transform groundCheck;
+    public GameObject DeadUI;
 
     private bool grounded = false;
     private float groundVelocity;
@@ -23,6 +24,7 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private GameObject player;
     private Rigidbody2D rb2d;
+    
 
 
 
@@ -38,7 +40,8 @@ public class PlayerController : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         rb2d = GetComponent<Rigidbody2D>();
-
+        DeadUI.SetActive(false);
+        gravityDir = down;
 
     }
 
@@ -91,8 +94,12 @@ public class PlayerController : MonoBehaviour
         Physics2D.gravity = 9.81f * gravityDir;
 
         /*****Determine if the player is touching the ground*****/
+        //I have to provide some offset to the linecast, or else we could potentially double jump (some problems with my platform colliders
 
         grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+        
+        //obstacleHit = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Laser Beams"));
+
         //grounded = Physics2D.Raycast(transform.position, -gravityDir, 0.9890461f);
         if (Input.GetKeyDown(KeyCode.Space) && grounded)
         {
@@ -112,10 +119,11 @@ public class PlayerController : MonoBehaviour
         }
 
         /*******Ground v/s air movement*********/
-        if (grounded)
+        if (grounded) { 
             if (gravityDir == down || gravityDir == up)
                 rb2d.velocity = new Vector2(h * maxSpeed * groundSpeedScale, rb2d.velocity.y);
             else rb2d.velocity = new Vector2(rb2d.velocity.x, h * maxSpeed * groundSpeedScale);
+        }
         else //in the air
         {
             if (gravityDir == down || gravityDir == up)
@@ -180,6 +188,8 @@ public class PlayerController : MonoBehaviour
             rb2d.AddForce(jumpForce * -gravityDir);
             jump = false;
         }
+
+     
     }
 
     void Flip()
@@ -188,8 +198,23 @@ public class PlayerController : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+
     }
 
 
+    void OnTriggerEnter2D (Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Laser Beam"))
+        {
+            anim.SetTrigger("Die");
+            DeadUI.SetActive(true);
+            this.enabled = false;
+            //rb2d.isKinematic = true;
+        }
+    }
+    
+    
+   
 }
  
+    
