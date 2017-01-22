@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerController : MonoBehaviour
@@ -17,13 +18,20 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 500f;
     public Transform groundCheck;
     public GameObject DeadUI;
+    public int nextscene;
+    public AudioClip[] jumpClips;
+    public AudioClip[] ouchClips;
 
     private bool grounded = false;
     private float groundVelocity;
+    public Vector3 lastCheckpoint; //For keeping track of checkpoints
+    public Vector2 checkpointGravity;
+    
 
     private Animator anim;
     private GameObject player;
     private Rigidbody2D rb2d;
+    private bool door; //Is the player at a door?
     
 
 
@@ -33,7 +41,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 down = new Vector2(0, -1);
     private Vector2 left = new Vector2(-1, 0);
     private Vector2 right = new Vector2(1, 0);
-    private Vector2 gravityDir;
+    public Vector2 gravityDir;
 
     // Use this for initialization
     void Start()
@@ -42,6 +50,16 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         DeadUI.SetActive(false);
         gravityDir = down;
+        lastCheckpoint = rb2d.position;
+
+        jumpClips = new AudioClip[] {(AudioClip)Resources.Load("Audio/Player/Jumps/Player-jump1"),
+                                      (AudioClip)Resources.Load("Audio/Player/Jumps/Player-jump2"),
+                                        (AudioClip)Resources.Load("Audio/Player/Jumps/Player-jump3")};
+
+        ouchClips = new AudioClip[] {(AudioClip)Resources.Load("Audio/Player/Ouch/Player-ouch1"),
+                                      (AudioClip)Resources.Load("Audio/Player/Ouch/Player-ouch2"),
+                                        (AudioClip)Resources.Load("Audio/Player/Ouch/Player-ouch3"),
+                                          (AudioClip)Resources.Load("Audio/Player/Ouch/Player-ouch4")};
 
     }
 
@@ -184,10 +202,15 @@ public class PlayerController : MonoBehaviour
             if (gravityDir == up || gravityDir == down)
                 groundVelocity = Mathf.Abs(rb2d.velocity.x);
             else groundVelocity = Mathf.Abs(rb2d.velocity.y);
-            
+
+            int i = Random.Range(0, jumpClips.Length);
+            AudioSource.PlayClipAtPoint(jumpClips[i], transform.position);
+
             rb2d.AddForce(jumpForce * -gravityDir);
             jump = false;
         }
+
+        
 
      
     }
@@ -206,10 +229,31 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Laser Beam"))
         {
-            anim.SetTrigger("Die");
+            //anim.SetTrigger("Die");
             DeadUI.SetActive(true);
-            this.enabled = false;
+
+           this.enabled = false;
+            int i = Random.Range(0, ouchClips.Length);
+            AudioSource.PlayClipAtPoint(ouchClips[i], transform.position);
             //rb2d.isKinematic = true;
+
+        } else if (other.gameObject.CompareTag("Door"))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+                SceneManager.LoadScene(nextscene);
+        } else if (other.gameObject.CompareTag("Checkpoint"))
+        {
+            lastCheckpoint = rb2d.position;
+            checkpointGravity = gravityDir;
+        }
+    }
+
+    void OnTriggerStay2D (Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Door"))
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+                SceneManager.LoadScene(nextscene);
         }
     }
     

@@ -21,7 +21,7 @@ public class MainMenu : MonoBehaviour {
 
     public void StartGame()
     {
-
+        SceneManager.LoadScene(0);
     }
 
     public void levels()
@@ -42,4 +42,9 @@ public class MainMenu : MonoBehaviour {
     {
         SceneManager.LoadScene(1); //Main Menu has to be scene 0, so +1 for every level
     }
+
+    public void level1() { SceneManager.LoadScene(2); }
+    public void level2() { SceneManager.LoadScene(3); }
+    public void level3() { SceneManager.LoadScene(4); }
+    public void level4() { SceneManager.LoadScene(5); }
 }

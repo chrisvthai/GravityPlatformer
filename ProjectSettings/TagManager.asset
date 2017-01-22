@@ -9,11 +9,9 @@ TagManager:
   - Enemy
   - Wall
   - Obstacle
-  - Bullet
-  - BombPickup
-  - ExplosionFX
-  - HealthBar
   - Laser Beam
+  - Door
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
@@ -56,6 +54,12 @@ TagManager:
     locked: 0
   - name: Background
     uniqueID: 1535931219
+    locked: 0
+  - name: Inside Backgrounds
+    uniqueID: 1714856643
+    locked: 0
+  - name: Door
+    uniqueID: 1891378281
     locked: 0
   - name: Character
     uniqueID: 2511236001

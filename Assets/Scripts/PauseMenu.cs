@@ -7,6 +7,9 @@ public class PauseMenu : MonoBehaviour {
 
     public GameObject PauseUI;
     public GameObject ControlsUI;
+    public GameObject DeadUI;
+    public PlayerController player;
+    public GameObject hero;
     private bool paused = false;
     
 
@@ -69,5 +72,13 @@ public class PauseMenu : MonoBehaviour {
     {
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
+    }
+
+    public void spawnAtCheckpoint()
+    {
+        hero.transform.position = player.lastCheckpoint;
+        player.gravityDir = player.checkpointGravity;
+        player.DeadUI.SetActive(false);
+        player.enabled = true;
     }
 }
